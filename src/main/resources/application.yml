@@ -1,0 +1,47 @@
+server:
+  servlet:
+    context-path: /
+  port: 8080
+logging:
+  level:
+    root: debug
+spring:
+  application:
+    name: ChasingDreams
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 替换成你自己的数据库地址
+    url: jdbc:mysql://127.0.0.1:3306/yourDataBaseName?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: root
+  data:
+    redis:
+      # redis 默认有16个数据库，我们使用 DB3
+      database: 3
+      # 替换成你自己的redis地址
+      host: localhost
+      # redis端口（默认为6379）
+      port: 6379
+      # redis访问密码（默认为空）
+      password:
+      # redis连接超时时间（单位毫秒）
+      timeout: 0
+      # redis连接池配置
+      jedis:
+        pool:
+          enabled: true
+          # 最大可用连接数（默认为8，负数表示无限）
+          max-active: 8
+          # 最大空闲连接数（默认为8，负数表示无限）
+          max-idle: 8
+          # 从连接池中获取连接最大等待时间（默认为-1，单位为毫秒，负数表示无限）
+          max-wait: -1
+          # 最小空闲连接数（默认为0，该值只有为正数才有用）
+          min-idle: 0
+
+jwt:
+  header: 'Authorization'
+  expire: 1800 # 半个小时过期
+  refreshExpire: 7200 # 2小时过期
+  # 使用的时候自己用AI工具重新生成一个: “帮我生成一个符合 HS512 规范的 secret”
+  secret: "q1w2e3r4t5y6u7i8o9p0asdfghjklzxcvbnmq1w2e3r4t5y6u7i8o9p0asdfghjklzxcvbnm"

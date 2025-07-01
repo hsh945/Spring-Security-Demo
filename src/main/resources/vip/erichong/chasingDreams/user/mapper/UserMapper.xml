@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="vip.erichong.chasingDreams.user.mapper.UserMapper">
+
+    <select id="getNavigationMenuIds" resultType="java.lang.Long">
+        SELECT
+            DISTINCT rm.menu_id
+        FROM
+            system_user_role ur
+            inner JOIN system_role_menu rm ON ur.role_id = rm.role_id
+        WHERE ur.user_id = #{userId}
+    </select>
+
+    <select id="listByMenuId" resultType="vip.erichong.chasingDreams.user.entity.User">
+        SELECT
+            DISTINCT u.*
+        FROM
+            system_user_role ur
+            inner JOIN system_role_menu rm ON ur.role_id = rm.role_id
+            inner JOIN user u ON ur.user_id = u.id and u.deleted = 0
+        WHERE
+            rm.menu_id = #{menuId}
+    </select>
+
+</mapper>
