@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -24,6 +25,9 @@ import java.util.Arrays;
  */
 @Configuration
 @RequiredArgsConstructor
+// 添加 EnableMethodSecurity 注解之后才能开启方法级权限控制
+// 例如：UserController 中 方法上的 @PreAuthorize("hasAuthority('system:user:list')") 才会生效
+@EnableMethodSecurity
 public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CaptchaFilter captchaFilter;
@@ -34,7 +38,7 @@ public class SecurityConfig {
 
     private static final String[] URL_WHITELIST = {
             "/favicon.ico",
-            "/captcha*",
+            "/captcha",
     };
 
     @Bean
