@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import vip.erichong.chasingDreams.common.Result;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * @author eric
@@ -20,7 +21,9 @@ public class LoginFailureHandle implements AuthenticationFailureHandler {
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
         response.setContentType("application/json;charset=utf-8");
-        Result<String> result = Result.fail(HttpStatus.BAD_REQUEST.value(), e.getMessage());
-        response.getWriter().write(JSONObject.toJSONString(result));
+        Result<String> result = Result.fail(HttpStatus.BAD_REQUEST.value(), "验证码有误");
+        try (PrintWriter writer = response.getWriter()) {
+            writer.write(JSONObject.toJSONString(result));
+        }
     }
 }

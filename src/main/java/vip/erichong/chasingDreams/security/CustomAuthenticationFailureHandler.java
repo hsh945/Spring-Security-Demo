@@ -24,8 +24,9 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         // 返回自定义格式的失败响应
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        Result<String> result = Result.fail(HttpStatus.UNAUTHORIZED.value(), "认证失败");
         try (PrintWriter writer = response.getWriter()) {
-            writer.write(JSONObject.toJSONString(JSONObject.toJSONString(Result.fail("认证失败"))));
+            writer.write(JSONObject.toJSONString(result));
         }
     }
 }

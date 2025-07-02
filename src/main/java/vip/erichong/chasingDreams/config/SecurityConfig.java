@@ -12,7 +12,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import vip.erichong.chasingDreams.security.*;
+
+import java.util.Arrays;
 
 /**
  * @author eric
@@ -28,7 +33,6 @@ public class SecurityConfig {
     private final JwtAccessDeniedHandlerImpl jwtAccessDeniedHandlerImpl;
 
     private static final String[] URL_WHITELIST = {
-            "/login",
             "/favicon.ico",
             "/captcha*",
     };
@@ -48,6 +52,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 // 关闭 CSRF
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(form -> form
@@ -83,16 +88,27 @@ public class SecurityConfig {
                                 .accessDeniedHandler(jwtAccessDeniedHandlerImpl)
                 );
 
-        // Filter -> Security -> Spring MVC ( WebMvcConfigurer.addCorsMappings )
-        // 如果使用 WebMvcConfigurer 的跨域处理，则需要 http.cors() 需要启用，让 Security 自己去委托 MVC 来处理跨域
-
-        // 允许跨域, 由于 CorsConfig 中已经自定义了 CorsFilter
-        // 此时应该显式的告诉 Security 不使用它自带的，用我们自定义的
-        // 虽然 Security 会检查用户是否自定义了 CorsFilter，有定义时它会跳过不会重复创建默认的 CorsFilter
-        // 但我们依然推荐你当自定义了 CorsFilter 则主动显式地配置它为禁用
-        http.cors(AbstractHttpConfigurer::disable);
-
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        // 1. 允许的来源（生产环境必须指定具体域名，如 "http://localhost:8080"）
+        // 允许所有来源（开发环境用）
+        config.addAllowedOriginPattern("*");
+        // 2. 允许的请求方法（必须包含 OPTIONS，预检请求用）
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // 3. 允许的请求头（包含自定义头，如 Token）
+        config.addAllowedHeader("*");
+        // 4. 允许携带 Cookie（跨域登录需要时开启）
+        config.setAllowCredentials(true);
+        // 5. 预检请求的缓存时间（减少 OPTIONS 请求次数）
+        config.setMaxAge(3600L);
+        // 6. 对所有接口生效
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 }
 
